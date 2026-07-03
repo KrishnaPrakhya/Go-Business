@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDebouncedValue, useReferralFeed } from '../lib/hooks.js'
+import { setCachedRow } from '../lib/api.js'
 import { formatDate, formatProfit } from '../lib/format.js'
 
 const PAGE_SIZE = 10
@@ -38,14 +39,19 @@ export default function ReferralsTable({ initialReferrals = [] }) {
     setPage(1)
   }
 
+  function goToRow(row) {
+    setCachedRow(row)
+    navigate(`/referral/${row.id}`)
+  }
+
   function goToPage(p) {
     setPage(Math.max(1, Math.min(p, totalPages)))
   }
 
-  function handleRowKey(e, id) {
+  function handleRowKey(e, row) {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
-      navigate(`/referral/${id}`)
+      goToRow(row)
     }
   }
 
@@ -114,8 +120,8 @@ export default function ReferralsTable({ initialReferrals = [] }) {
                   slice.map((row) => (
                     <tr
                       key={row.id}
-                      onClick={() => navigate(`/referral/${row.id}`)}
-                      onKeyDown={(e) => handleRowKey(e, row.id)}
+                      onClick={() => goToRow(row)}
+                      onKeyDown={(e) => handleRowKey(e, row)}
                       tabIndex={0}
                       role="row"
                     >

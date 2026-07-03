@@ -2,33 +2,37 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import Navbar from '../components/Navbar.jsx'
 import SiteFooter from '../components/SiteFooter.jsx'
-import { fetchReferralById } from '../lib/api.js'
+import { fetchReferralById, getCachedRow } from '../lib/api.js'
 import { formatDate, formatProfit } from '../lib/format.js'
 
 export default function ReferralDetailPage() {
   const { id } = useParams()
-  const [row, setRow] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const cached = getCachedRow(id)
+
+  const [row, setRow] = useState(cached)
+  const [loading, setLoading] = useState(!cached)
   const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
     setNotFound(false)
-    setRow(null)
+    if (!cached) {
+      setLoading(true)
+      setRow(null)
+    }
     fetchReferralById(id)
       .then((data) => {
         if (cancelled) return
         if (data) {
           setRow(data)
         } else {
-          setNotFound(true)
+          if (!cached) setNotFound(true)
         }
         setLoading(false)
       })
       .catch(() => {
         if (cancelled) return
-        setNotFound(true)
+        if (!cached) setNotFound(true)
         setLoading(false)
       })
     return () => {
@@ -63,7 +67,7 @@ export default function ReferralDetailPage() {
           </div>
         )}
 
-        {!loading && row && (
+        {row && (
           <div className="card detail-card">
             <h1 className="detail-heading">Referral Details</h1>
             <h2 className="detail-partner">{row.name}</h2>

@@ -6,6 +6,16 @@ const SIGNIN_URL = `${BASE}/api/auth/signin`
 
 const inflight = new Map()
 
+let rowCache = null
+
+export function setCachedRow(row) {
+  rowCache = row
+}
+
+export function getCachedRow(id) {
+  return rowCache && String(rowCache.id) === String(id) ? rowCache : null
+}
+
 async function getJson(url, token) {
   if (inflight.has(url)) {
     return inflight.get(url)
