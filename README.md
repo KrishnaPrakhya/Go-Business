@@ -61,13 +61,13 @@ vercel.json             SPA rewrite for deep links
 
 ## Routes
 
-| Route | Access | Behavior |
-|---|---|---|
-| `/login` | Public | Authenticated → redirect `/` |
-| `/` | Protected | Referral Dashboard |
-| `/dashboard/referrals` | — | Redirects to `/` |
-| `/referral/:id` | Protected | Detail page |
-| `*` | Public | 404 page |
+| Route                  | Access    | Behavior                     |
+| ---------------------- | --------- | ---------------------------- |
+| `/login`               | Public    | Authenticated → redirect `/` |
+| `/`                    | Protected | Referral Dashboard           |
+| `/dashboard/referrals` | —         | Redirects to `/`             |
+| `/referral/:id`        | Protected | Detail page                  |
+| `*`                    | Public    | 404 page                     |
 
 ## Test Credentials
 
@@ -78,4 +78,4 @@ Password: admin123
 
 ## Live Deploy
 
-> Replace this line with your Vercel deploy URL after deployment.
+https://go-business-beta.vercel.app/login
