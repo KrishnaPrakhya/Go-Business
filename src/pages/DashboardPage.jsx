@@ -58,7 +58,7 @@ export default function DashboardPage() {
             <OverviewMetrics metrics={overview.metrics} />
             <ServiceSummary data={overview.serviceSummary} />
             <ShareReferral data={overview.referral} />
-            <ReferralsTable />
+            <ReferralsTable initialReferrals={overview.referrals} />
           </div>
         )}
       </main>

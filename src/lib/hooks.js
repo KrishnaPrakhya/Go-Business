@@ -11,13 +11,16 @@ export function useDebouncedValue(value, delay = 300) {
 }
 
 export function useReferralFeed(search, sort) {
-  const [state, setState] = useState({ data: null, loading: true, error: null })
+  const [state, setState] = useState({ data: null, loading: false, error: null })
   const cancelRef = useRef(false)
 
   useEffect(() => {
+    if (search === null && sort === null) {
+      return
+    }
     cancelRef.current = false
     setState((prev) => ({ ...prev, loading: true, error: null }))
-    fetchReferrals({ search, sort })
+    fetchReferrals({ search: search ?? '', sort: sort ?? 'desc' })
       .then((data) => {
         if (cancelRef.current) return
         setState({ data, loading: false, error: null })

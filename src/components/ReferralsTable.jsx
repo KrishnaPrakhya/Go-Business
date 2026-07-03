@@ -1,24 +1,30 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useDebouncedValue } from '../lib/hooks.js'
-import { useReferralFeed } from '../lib/hooks.js'
+import { useDebouncedValue, useReferralFeed } from '../lib/hooks.js'
 import { formatDate, formatProfit } from '../lib/format.js'
 
 const PAGE_SIZE = 10
 
-export default function ReferralsTable() {
+export default function ReferralsTable({ initialReferrals = [] }) {
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState('desc')
   const [page, setPage] = useState(1)
   const navigate = useNavigate()
 
   const debouncedSearch = useDebouncedValue(search, 300)
-  const { data, loading, error } = useReferralFeed(debouncedSearch, sort)
+  const isFiltered = debouncedSearch !== '' || sort !== 'desc'
+  const { data, loading, error } = useReferralFeed(
+    isFiltered ? debouncedSearch : null,
+    isFiltered ? sort : null,
+  )
 
-  const referrals = data?.referrals ?? []
+  const referrals = isFiltered ? (data?.referrals ?? []) : initialReferrals
+  const tableLoading = isFiltered ? loading : false
+  const tableError = isFiltered ? error : null
+
   const totalPages = Math.max(1, Math.ceil(referrals.length / PAGE_SIZE))
   const safePage = Math.min(page, totalPages)
-  const from = (safePage - 1) * PAGE_SIZE + 1
+  const from = referrals.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1
   const to = Math.min(safePage * PAGE_SIZE, referrals.length)
   const slice = referrals.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
 
@@ -71,21 +77,21 @@ export default function ReferralsTable() {
         </label>
       </div>
 
-      {loading && (
+      {tableLoading && (
         <div className="loading-state">
           <div className="spinner" />
           <span>Loading referrals…</span>
         </div>
       )}
 
-      {!loading && error && (
+      {!tableLoading && tableError && (
         <div className="error-alert" role="alert">
           <span className="error-alert-icon">⚠</span>
-          <span>{error}</span>
+          <span>{tableError}</span>
         </div>
       )}
 
-      {!loading && !error && (
+      {!tableLoading && !tableError && (
         <>
           <div className="table-wrap">
             <table>
@@ -127,9 +133,7 @@ export default function ReferralsTable() {
           {referrals.length > 0 && (
             <div className="pagination">
               <span className="pagination-info">
-                {referrals.length === 0
-                  ? 'No entries'
-                  : `Showing ${from}\u2013${to} of ${referrals.length} entries`}
+                {`Showing ${from}\u2013${to} of ${referrals.length} entries`}
               </span>
               <div className="pagination-controls">
                 <button
